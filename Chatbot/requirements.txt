@@ -1,0 +1,19 @@
+# LangChain Core
+langchain
+langchain-core
+
+
+# OpenAI Inteegration
+langchain-openai
+openai
+
+
+#Environment Variable Management
+python-dotenv
+
+#Machine Learning Utilites
+numpy 
+scikit-learn
+
+
+# pip install "unstructured[all-docs]" pillow pydantic lxml matplotlib

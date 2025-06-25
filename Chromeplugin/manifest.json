@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube RAG Chatbot",
+  "version": "1.0",
+  "description": "Ask questions based on YouTube transcripts using your FastAPI backend.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
