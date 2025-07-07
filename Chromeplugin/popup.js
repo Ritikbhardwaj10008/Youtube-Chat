@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     this.style.height = this.scrollHeight + "px";
   });
 
-  // Dark mode toggle (syncs with popup.html)
+  // Dark mode toggle
   const toggle = document.querySelector(".toggle-theme");
   if (toggle) {
     toggle.addEventListener("click", () => {
@@ -45,11 +45,13 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // Show user message
     addMessage(question, "user");
     questionInput.value = "";
 
+    // Show thinking bubble and start animation
     const thinkingBubble = addMessage("...", "bot");
-    animateThinking(thinkingBubble);
+    const thinkingInterval = animateThinking(thinkingBubble);
 
     try {
       const response = await fetch("http://localhost:8000/chat", {
@@ -62,15 +64,17 @@ document.addEventListener("DOMContentLoaded", function () {
         })
       });
 
+      const data = await response.json();
+      clearInterval(thinkingInterval); // stop animation
+
       if (!response.ok) {
-        const errorData = await response.json();
-        thinkingBubble.textContent = `Error: ${errorData.detail}`;
+        thinkingBubble.textContent = `Error: ${data.detail || "Something went wrong."}`;
         return;
       }
 
-      const data = await response.json();
-      thinkingBubble.textContent = data.answer;
+      thinkingBubble.textContent = data.answer || "No response.";
     } catch (err) {
+      clearInterval(thinkingInterval);
       thinkingBubble.textContent = "Something went wrong. Please check the backend.";
       console.error(err);
     }
@@ -92,9 +96,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function extractYouTubeVideoId(url) {
-    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^\s&]+)/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
+    const patterns = [
+      /youtube\.com\/watch\?v=([^&\s]+)/,
+      /youtu\.be\/([^&\s]+)/,
+      /youtube\.com\/shorts\/([^?\s]+)/,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
   }
 
   function animateThinking(bubble) {
@@ -104,5 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
       dots = (dots + 1) % 4;
       bubble.textContent = "Thinking" + ".".repeat(dots);
     }, 500);
+    return interval;
   }
 });
